@@ -1,23 +1,18 @@
-import { _decorator, Node } from 'cc';
-import { Bullet } from '../bullet/Bullet';
-const { ccclass, property } = _decorator;
-
-export class Constant   {
+export class Constant {
     //box range
-    public static  BackgroundRange = {
-        Top : -50,
-        Bottom : 45,
+    public static BackgroundRange = {
+        Top: -50,
+        Bottom: 45,
         Right: 23,
         Left: -23
     };
-
 
     /*enemy
      *     时间 | 0~10 | 11~20  |   20+   |
      *     组合 |  1   | 1、2   | 1、2、3 |
      *  组合间隔|   1  |  0.8   |   0.6   |
      **/
-    public static  EnemyType = {
+    public static EnemyType = {
         TYPE1: 1,       //慢
         TYPE2: 2        //快
     };
@@ -31,20 +26,21 @@ export class Constant   {
     public static EnemySpeed = {
         one: 0.5,
         two: 0.7
-    }
+    };
 
     public static EnemyCombinationInterval = {
         CombinationKind1: 1,
         CombinationKind2: 0.8,
         CombinationKind3: 0.6
-    }
+    };
 
 
     //bullet
     public static BulletSpeed = {
-        one: -1,
-        two: -2
-    }
+        PlayerOne: -1,
+
+        EnemyOne: 1
+    };
 }
 
 

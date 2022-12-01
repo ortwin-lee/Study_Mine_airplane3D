@@ -1,12 +1,20 @@
-import { _decorator, Component, Node, sp } from 'cc';
+import { _decorator, Component } from 'cc';
 const { ccclass, property } = _decorator;
 import { Constant } from '../framework/Constant'
+import { GameManager } from '../framework/GameManager';
 
 @ccclass('EnemyPlane')
 export class EnemyPlane extends Component {
-    private _enemySpeed = 0;
+    @property
+    public createBulletTime = 0.5;
 
-    // public enemyType = Constant.EnemyType.TYPE1;
+    private _enemySpeed = 0;
+    private _needBullet = false;
+
+    private _gameManager: GameManager = null;
+
+    private _currCreateBulletTime = 0;
+
 
     start() {
 
@@ -17,15 +25,25 @@ export class EnemyPlane extends Component {
         const moveLength = pos.z + this._enemySpeed;
         this.node.setPosition(pos.x, pos.y, moveLength)
 
+        if(this._needBullet) {
+            this._currCreateBulletTime += deltaTime;
+            if(this._currCreateBulletTime > this.createBulletTime) {
+                this._gameManager.createEnemyBullet(this.node.position);
+                this._currCreateBulletTime = 0;
+            }
+        }
+
+
         if (moveLength > Constant.BackgroundRange.Bottom) {
             this.node.destroy();
-            console.log(`${this.node.name} destroy`);
         }
     }
 
-    //speed
-    set speed(speed: number) {
+    //speed and bullet
+    public setEnemyPlane(gameManager: GameManager, speed: number, needBullet: boolean) {
+        this._gameManager = gameManager;
         this._enemySpeed = speed;
+        this._needBullet = needBullet;
     }
 }
 

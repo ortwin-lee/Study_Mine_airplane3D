@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, math } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, math, Vec3 } from 'cc';
 import { Bullet } from '../bullet/Bullet';
 import { EnemyPlane } from '../plane/EnemyPlane';
 import { Constant } from './Constant';
@@ -66,7 +66,7 @@ export class GameManager extends Component {
         } else if (this._combinationInterval === Constant.EnemyCombination.KIND2) {
             if (this._currCreateEnemyTime > this.createEnemyTime * Constant.EnemyCombinationInterval.CombinationKind2) {
                 const randomCombination = math.randomRangeInt(1, 6);
-                if(randomCombination === 1) {
+                if (randomCombination === 1) {
                     this.createEnemyPlane_CombianationKind2();
                 } else {
                     this.createEnemyPlane_CombianationKind1();
@@ -76,12 +76,11 @@ export class GameManager extends Component {
         } else if (this._combinationInterval === Constant.EnemyCombination.KIND3) {
             if (this._currCreateEnemyTime > this.createEnemyTime * Constant.EnemyCombinationInterval.CombinationKind3) {
                 const randomCombination = math.randomRangeInt(1, 10);
-                console.log(randomCombination);
-                if(randomCombination === 4) {
+                if (randomCombination === 4) {
                     this.createEnemyPlane_CombianationKind2();
                 } else if (randomCombination === 6) {
                     this.createEnemyPlane_CombianationKind3();
-                }else {
+                } else {
                     this.createEnemyPlane_CombianationKind1();
                 }
                 this._currCreateEnemyTime = 0;
@@ -97,22 +96,38 @@ export class GameManager extends Component {
 
 
     //bullet
+    //-------------------start--------------------------
     public createPlayerBullet() {
         const bullet = instantiate(this.bullet01);
         bullet.setParent(this.bulletRoot);
         const pos = this.playerPlane.position;
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletCmp = bullet.getComponent(Bullet);
-        bulletCmp.bulletSpeed = Constant.BulletSpeed.one;
+        bulletCmp.setBullet(Constant.BulletSpeed.PlayerOne, false);
     }
+
+
+    public createEnemyBullet(targetPos: Vec3) {
+        const bullet = instantiate(this.bullet01);
+        bullet.setParent(this.bulletRoot);
+        bullet.setPosition(targetPos.x, targetPos.y, targetPos.z + 5);
+        const bulletCmp = bullet.getComponent(Bullet);
+        bulletCmp.setBullet(Constant.BulletSpeed.EnemyOne, true);
+    }
+
 
     public isShooting(value: boolean) {
         this._isShooting = value;
     }
+    //-------------------end--------------------------
+
+
+
 
 
 
     //enemy
+    //-------------------start--------------------------
     private _changePlaneCombination() {
         this.schedule(this._combinationChanged, 10, 2, 1);
     }
@@ -136,7 +151,7 @@ export class GameManager extends Component {
         const enemy = instantiate(prefab);
         enemy.setParent(this.node);
         const enemyCmpt_EnemyPlane = enemy.getComponent(EnemyPlane);
-        enemyCmpt_EnemyPlane.speed = speed;
+        enemyCmpt_EnemyPlane.setEnemyPlane(this, speed, true);
 
         const randomPos = math.randomRangeInt(Constant.BackgroundRange.Left + 3, Constant.BackgroundRange.Right - 3);
         enemy.setPosition(randomPos, 0, Constant.BackgroundRange.Top);
@@ -144,13 +159,13 @@ export class GameManager extends Component {
 
     private createEnemyPlane_CombianationKind2() {
         const enenmyArray = new Array<Node>(5);
-        for(let i = 0; i <enenmyArray.length; i++) {
+        for (let i = 0; i < enenmyArray.length; i++) {
             enenmyArray[i] = instantiate(this.enemy01);
             const eachEnemy = enenmyArray[i];
             eachEnemy.parent = this.node;
             eachEnemy.setPosition(-20 + i * 10, 0, Constant.BackgroundRange.Top);
             const enemyCmpt_EnemyPlane = eachEnemy.getComponent(EnemyPlane);
-            enemyCmpt_EnemyPlane.speed = Constant.EnemySpeed.one;
+            enemyCmpt_EnemyPlane.setEnemyPlane(this, Constant.EnemySpeed.one, false);
         }
     }
 
@@ -158,24 +173,25 @@ export class GameManager extends Component {
         const enenmyArray = new Array<Node>(7);
 
         const posTop = Constant.BackgroundRange.Top;
-        const combiantionPos = [
-            [-21, 0 , posTop-15],
-            [-14, 0 , posTop-10],
-            [-7, 0 , posTop-5],
-            [0,0,posTop],
-            [7, 0 , posTop-5],
-            [14, 0 , posTop-10],
-            [21, 0 , posTop-15],
+        const combiantionPos: Array<[number, number, number]> = [
+            [-21, 0, posTop - 15],
+            [-14, 0, posTop - 10],
+            [-7, 0, posTop - 5],
+            [0, 0, posTop],
+            [7, 0, posTop - 5],
+            [14, 0, posTop - 10],
+            [21, 0, posTop - 15],
         ]
-        for(let i = 0; i <enenmyArray.length; i++) {
+        for (let i = 0; i < enenmyArray.length; i++) {
             enenmyArray[i] = instantiate(this.enemy02);
             const eachEnemy = enenmyArray[i];
             eachEnemy.parent = this.node;
             eachEnemy.setPosition(combiantionPos[i][0], combiantionPos[i][1], combiantionPos[i][2]);
             const enemyCmpt_EnemyPlane = eachEnemy.getComponent(EnemyPlane);
-            enemyCmpt_EnemyPlane.speed = Constant.EnemySpeed.two;
+            enemyCmpt_EnemyPlane.setEnemyPlane(this, Constant.EnemySpeed.two, false);
         }
     }
+    //-------------------end--------------------------
 }
 
 
