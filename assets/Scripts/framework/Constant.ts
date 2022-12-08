@@ -41,6 +41,15 @@ export class Constant {
 
         EnemyOne: 1
     };
+
+    //collision
+    public static CollisionType = {
+        DEFAULT: 1 << 0,
+        SELF_PLANE: 1 << 1,
+        ENEMY_PLANE: 1 << 2,
+        SELF_BULLET: 1 << 3,
+        ENEMY_BULLET: 1 << 4
+    }
 }
 
 

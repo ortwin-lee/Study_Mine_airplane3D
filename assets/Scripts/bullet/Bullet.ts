@@ -1,4 +1,4 @@
-import { _decorator, Component } from 'cc';
+import { _decorator, Component, ITriggerEvent, Collider } from 'cc';
 const { ccclass } = _decorator;
 
 import { Constant } from '../framework/Constant'
@@ -9,6 +9,16 @@ export class Bullet extends Component {
     private _speed = 0;
     private _isEnemyBullet = false;
 
+
+    onEnable() {
+        const collider = this.getComponent(Collider);
+        collider.on('onTriggerEnter', this._onTriggerEnter, this)
+    }
+
+    onDisable() {
+        const collider = this.getComponent(Collider);
+        collider.off('onTriggerEnter', this._onTriggerEnter, this)
+    }
 
     start() {
 
@@ -22,12 +32,10 @@ export class Bullet extends Component {
         if(this._isEnemyBullet) {
             if (moveLength > Constant.BackgroundRange.Bottom) {
                 this.node.destroy();
-                console.log('Enemy bullet destroy');
             }
         } else {
             if (moveLength < Constant.BackgroundRange.Top) {
                 this.node.destroy();
-                console.log('player bullet destroy');
             }
         }
 
@@ -37,6 +45,15 @@ export class Bullet extends Component {
 
         this._speed = speed;
         this._isEnemyBullet = isEnemyBullet;
+    }
+
+    //collision
+    private _onTriggerEnter(event: ITriggerEvent) {
+        const collisionGroup = event.otherCollider.getGroup()
+        if(collisionGroup == Constant.CollisionType.SELF_PLANE || collisionGroup == Constant.CollisionType.SELF_BULLET)
+        {
+            this.node.destroy();
+        }
     }
 }
 

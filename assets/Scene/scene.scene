@@ -24,23 +24,23 @@
         "__id__": 12
       },
       {
-        "__id__": 28
+        "__id__": 31
       },
       {
-        "__id__": 37
+        "__id__": 40
       },
       {
-        "__id__": 36
+        "__id__": 39
       }
     ],
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 38
+      "__id__": 41
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 39
+      "__id__": 42
     },
     "_id": "dc0ddc9e-83fa-4282-99ce-16e348318c66"
   },
@@ -388,7 +388,17 @@
       }
     ],
     "_active": true,
-    "_components": [],
+    "_components": [
+      {
+        "__id__": 28
+      },
+      {
+        "__id__": 29
+      },
+      {
+        "__id__": 30
+      }
+    ],
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -592,6 +602,75 @@
     ]
   },
   {
+    "__type__": "f974b93oe1DUbHzExyWfAsz",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 12
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_id": "a8ZJmfxfdOnb9koiHzkcHz"
+  },
+  {
+    "__type__": "cc.BoxCollider",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 12
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_material": {
+      "__uuid__": "ba21476f-2866-4f81-9c4d-6e359316e448",
+      "__expectedType__": "cc.PhysicsMaterial"
+    },
+    "_isTrigger": true,
+    "_center": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": -0.7
+    },
+    "_size": {
+      "__type__": "cc.Vec3",
+      "x": 13,
+      "y": 1,
+      "z": 11
+    },
+    "_id": "f7eHzsdItMDqow/765nD1o"
+  },
+  {
+    "__type__": "cc.RigidBody",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 12
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_group": 2,
+    "_type": 4,
+    "_mass": 1,
+    "_allowSleep": true,
+    "_linearDamping": 0.1,
+    "_angularDamping": 0.1,
+    "_useGravity": true,
+    "_linearFactor": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_angularFactor": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_id": "79nLtkKgFP5pIp1OEzOmZG"
+  },
+  {
     "__type__": "cc.Node",
     "_name": "UIManager",
     "_objFlags": 0,
@@ -600,22 +679,22 @@
     },
     "_children": [
       {
-        "__id__": 29
+        "__id__": 32
       }
     ],
     "_active": true,
     "_components": [
       {
-        "__id__": 31
-      },
-      {
-        "__id__": 32
-      },
-      {
-        "__id__": 33
-      },
-      {
         "__id__": 34
+      },
+      {
+        "__id__": 35
+      },
+      {
+        "__id__": 36
+      },
+      {
+        "__id__": 37
       }
     ],
     "_prefab": null,
@@ -652,13 +731,13 @@
     "_name": "Camera",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 28
+      "__id__": 31
     },
     "_children": [],
     "_active": true,
     "_components": [
       {
-        "__id__": 30
+        "__id__": 33
       }
     ],
     "_prefab": null,
@@ -695,7 +774,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 29
+      "__id__": 32
     },
     "_enabled": true,
     "__prefab": null,
@@ -703,7 +782,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 497.0597738287561,
+    "_orthoHeight": 424.258064516129,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -738,7 +817,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 28
+      "__id__": 31
     },
     "_enabled": true,
     "__prefab": null,
@@ -759,12 +838,12 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 28
+      "__id__": 31
     },
     "_enabled": true,
     "__prefab": null,
     "_cameraComponent": {
-      "__id__": 30
+      "__id__": 33
     },
     "_alignCanvasWithScreen": true,
     "_id": "23POkTYYVHlbxvdW0WxsnL"
@@ -774,7 +853,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 28
+      "__id__": 31
     },
     "_enabled": true,
     "__prefab": null,
@@ -803,7 +882,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 28
+      "__id__": 31
     },
     "_enabled": true,
     "__prefab": null,
@@ -812,7 +891,7 @@
       "__id__": 12
     },
     "gameManager": {
-      "__id__": 35
+      "__id__": 38
     },
     "_id": "76jBFGgcBP/5T0wthHer6I"
   },
@@ -821,7 +900,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 36
+      "__id__": 39
     },
     "_enabled": true,
     "__prefab": null,
@@ -850,7 +929,7 @@
     },
     "shootTime": 0.1,
     "bulletRoot": {
-      "__id__": 37
+      "__id__": 40
     },
     "enemy01": {
       "__uuid__": "174e1c26-2602-4468-9905-2d1f9ed6d27b",
@@ -874,7 +953,7 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 35
+        "__id__": 38
       }
     ],
     "_prefab": null,
@@ -957,19 +1036,19 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 40
-    },
-    "shadows": {
-      "__id__": 41
-    },
-    "_skybox": {
-      "__id__": 42
-    },
-    "fog": {
       "__id__": 43
     },
-    "octree": {
+    "shadows": {
       "__id__": 44
+    },
+    "_skybox": {
+      "__id__": 45
+    },
+    "fog": {
+      "__id__": 46
+    },
+    "octree": {
+      "__id__": 47
     }
   },
   {

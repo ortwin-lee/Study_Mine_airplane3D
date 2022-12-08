@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, math, Vec3 } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, math, Vec3, RigidBodyComponent } from 'cc';
 import { Bullet } from '../bullet/Bullet';
 import { EnemyPlane } from '../plane/EnemyPlane';
 import { Constant } from './Constant';
@@ -104,6 +104,10 @@ export class GameManager extends Component {
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletCmp = bullet.getComponent(Bullet);
         bulletCmp.setBullet(Constant.BulletSpeed.PlayerOne, false);
+
+        const colliderComp = bullet.getComponent(RigidBodyComponent)
+        colliderComp.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
     }
 
 
@@ -113,6 +117,10 @@ export class GameManager extends Component {
         bullet.setPosition(targetPos.x, targetPos.y, targetPos.z + 5);
         const bulletCmp = bullet.getComponent(Bullet);
         bulletCmp.setBullet(Constant.BulletSpeed.EnemyOne, true);
+
+        const colliderComp = bullet.getComponent(RigidBodyComponent)
+        colliderComp.setGroup(Constant.CollisionType.ENEMY_BULLET);
+        colliderComp.setMask(Constant.CollisionType.SELF_PLANE | Constant.CollisionType.SELF_BULLET);
     }
 
 
@@ -192,6 +200,16 @@ export class GameManager extends Component {
         }
     }
     //-------------------end--------------------------
+
+
+
+    //score
+    //-------------------start--------------------------
+    public addScore() {
+
+    }
+    //-------------------end--------------------------
+
 }
 
 
