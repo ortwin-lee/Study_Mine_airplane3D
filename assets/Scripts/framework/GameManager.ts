@@ -1,5 +1,6 @@
-import { _decorator, Component, Node, Prefab, instantiate, math, Vec3, RigidBodyComponent } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, math, Vec3, RigidBodyComponent, macro } from 'cc';
 import { Bullet } from '../bullet/Bullet';
+import { BulletProp } from '../bullet/BulletProp';
 import { EnemyPlane } from '../plane/EnemyPlane';
 import { Constant } from './Constant';
 const { ccclass, property } = _decorator;
@@ -24,8 +25,17 @@ export class GameManager extends Component {
     public shootTime = 0.3;
     @property(Node)
     public bulletRoot: Node = null;
-    @property
 
+    //bulletType
+    private _bulletType = Constant.BulletPropType.BULLET_M;
+    @property(Prefab)
+    public bulletPropM: Prefab = null;
+    @property(Prefab)
+    public bulletPropH: Prefab = null;
+    @property(Prefab)
+    public bulletPropS: Prefab = null;
+    @property
+    public bulletPropSpeed = 0.3;
 
     //enemy
     @property(Prefab)
@@ -44,6 +54,7 @@ export class GameManager extends Component {
     private _combinationInterval = 0;
 
 
+
     start() {
         this._init();
     }
@@ -52,18 +63,24 @@ export class GameManager extends Component {
         //bullet
         this._currshootTime += deltaTime;
         if (this._isShooting && this._currshootTime > this.shootTime) {
-            this.createPlayerBullet();
+            if (this._bulletType === Constant.BulletPropType.BULLET_H) {
+                this.createPlayerBulletH();
+            } else if (this._bulletType === Constant.BulletPropType.BULLET_S) {
+                this.createPlayerBulletS();
+            } else {
+                this.createPlayerBulletM();
+            }
             this._currshootTime = 0;
         }
 
         //enemy
         this._currCreateEnemyTime += deltaTime;
-        if (this._combinationInterval === Constant.EnemyCombination.KIND1) {
+        if (this._combinationInterval % 3 === Constant.EnemyCombination.KIND1) {
             if (this._currCreateEnemyTime > this.createEnemyTime * Constant.EnemyCombinationInterval.CombinationKind1) {
                 this.createEnemyPlane_CombianationKind1();
                 this._currCreateEnemyTime = 0;
             }
-        } else if (this._combinationInterval === Constant.EnemyCombination.KIND2) {
+        } else if (this._combinationInterval % 3 === Constant.EnemyCombination.KIND2) {
             if (this._currCreateEnemyTime > this.createEnemyTime * Constant.EnemyCombinationInterval.CombinationKind2) {
                 const randomCombination = math.randomRangeInt(1, 6);
                 if (randomCombination === 1) {
@@ -73,7 +90,7 @@ export class GameManager extends Component {
                 }
                 this._currCreateEnemyTime = 0;
             }
-        } else if (this._combinationInterval === Constant.EnemyCombination.KIND3) {
+        } else if (this._combinationInterval % 3 === Constant.EnemyCombination.KIND3) {
             if (this._currCreateEnemyTime > this.createEnemyTime * Constant.EnemyCombinationInterval.CombinationKind3) {
                 const randomCombination = math.randomRangeInt(1, 10);
                 if (randomCombination === 4) {
@@ -97,7 +114,7 @@ export class GameManager extends Component {
 
     //bullet
     //-------------------start--------------------------
-    public createPlayerBullet() {
+    public createPlayerBulletM() {
         const bullet = instantiate(this.bullet01);
         bullet.setParent(this.bulletRoot);
         const pos = this.playerPlane.position;
@@ -108,6 +125,59 @@ export class GameManager extends Component {
         const colliderComp = bullet.getComponent(RigidBodyComponent)
         colliderComp.setGroup(Constant.CollisionType.SELF_BULLET);
         colliderComp.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
+    }
+
+    public createPlayerBulletH() {
+        const pos = this.playerPlane.position;
+        //left
+        const bullet1 = instantiate(this.bullet02);
+        bullet1.setParent(this.bulletRoot);
+        bullet1.setPosition(pos.x - 3.5, pos.y, pos.z - 7);
+        const bulletCmp1 = bullet1.getComponent(Bullet);
+        bulletCmp1.setBullet(Constant.BulletSpeed.PlayerOne, false);
+        const colliderComp1 = bullet1.getComponent(RigidBodyComponent)
+        colliderComp1.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp1.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
+        //right
+        const bullet2 = instantiate(this.bullet02);
+        bullet2.setParent(this.bulletRoot);
+        bullet2.setPosition(pos.x + 3.5, pos.y, pos.z - 7);
+        const bulletCmp2 = bullet2.getComponent(Bullet);
+        bulletCmp2.setBullet(Constant.BulletSpeed.PlayerOne, false);
+        const colliderComp2 = bullet2.getComponent(RigidBodyComponent)
+        colliderComp2.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp2.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
+    }
+
+    public createPlayerBulletS() {
+        const pos = this.playerPlane.position;
+        //left
+        const bullet1 = instantiate(this.bullet03);
+        bullet1.setParent(this.bulletRoot);
+        bullet1.setPosition(pos.x - 3.5, pos.y, pos.z - 7);
+        const bulletCmp1 = bullet1.getComponent(Bullet);
+        bulletCmp1.setBullet(Constant.BulletSpeed.PlayerOne, false, Constant.Direction.LEFT);
+        const colliderComp1 = bullet1.getComponent(RigidBodyComponent)
+        colliderComp1.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp1.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
+        //middle
+        const bullet2 = instantiate(this.bullet03);
+        bullet2.setParent(this.bulletRoot);
+        bullet2.setPosition(pos.x, pos.y, pos.z - 7);
+        const bulletCmp2 = bullet2.getComponent(Bullet);
+        bulletCmp2.setBullet(Constant.BulletSpeed.PlayerOne, false);
+        const colliderComp2 = bullet2.getComponent(RigidBodyComponent)
+        colliderComp2.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp2.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
+        //right
+        const bullet3 = instantiate(this.bullet03);
+        bullet3.setParent(this.bulletRoot);
+        bullet3.setPosition(pos.x + 3.5, pos.y, pos.z - 7);
+        const bulletCmp3 = bullet3.getComponent(Bullet);
+        bulletCmp3.setBullet(Constant.BulletSpeed.PlayerOne, false, Constant.Direction.RIGHT);
+        const colliderComp3 = bullet3.getComponent(RigidBodyComponent)
+        colliderComp3.setGroup(Constant.CollisionType.SELF_BULLET);
+        colliderComp3.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
     }
 
 
@@ -127,6 +197,30 @@ export class GameManager extends Component {
     public isShooting(value: boolean) {
         this._isShooting = value;
     }
+
+    public changeBulletType(type: number) {
+        this._bulletType = type;
+    }
+
+    public createBulletProp() {
+        const randomProp = math.randomRangeInt(1, 4);
+        let prefab: Prefab = null;
+        if (randomProp === Constant.BulletPropType.BULLET_H) {
+            prefab = this.bulletPropH;
+        } else if (randomProp === Constant.BulletPropType.BULLET_S) {
+            prefab = this.bulletPropS;
+        } else {
+            prefab = this.bulletPropM;
+        }
+
+        const prop = instantiate(prefab);
+        prop.setParent(this.node);
+        const randomPosX = math.randomRangeInt(Constant.BackgroundRange.Left + 15, Constant.BackgroundRange.Right - 15);
+        prop.setPosition(randomPosX, 0, Constant.BackgroundRange.Top);
+        const propComp = prop.getComponent(BulletProp);
+        propComp.setBulletProp(this, -this.bulletPropSpeed);
+
+    }
     //-------------------end--------------------------
 
 
@@ -137,11 +231,12 @@ export class GameManager extends Component {
     //enemy
     //-------------------start--------------------------
     private _changePlaneCombination() {
-        this.schedule(this._combinationChanged, 10, 2, 1);
+        this.schedule(this._combinationChanged, 10, macro.REPEAT_FOREVER, 1);
     }
 
     private _combinationChanged() {
         this._combinationInterval++;
+        this.createBulletProp();
     }
 
     private createEnemyPlane_CombianationKind1() {

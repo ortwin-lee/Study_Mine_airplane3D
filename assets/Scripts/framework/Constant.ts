@@ -38,8 +38,14 @@ export class Constant {
     //bullet
     public static BulletSpeed = {
         PlayerOne: -1,
+        EnemyOne: 1,
+        XOffset: 0.3
+    };
 
-        EnemyOne: 1
+    public static Direction = {
+        LEFT: 1,
+        MIDDLE: 2,
+        RIGHT: 3,
     };
 
     //collision
@@ -48,7 +54,14 @@ export class Constant {
         SELF_PLANE: 1 << 1,
         ENEMY_PLANE: 1 << 2,
         SELF_BULLET: 1 << 3,
-        ENEMY_BULLET: 1 << 4
+        ENEMY_BULLET: 1 << 4,
+        BULLET_PROP: 1<<5
+    }
+
+    public static BulletPropType = {
+        BULLET_M: 1,
+        BULLET_H: 2,
+        BULLET_S: 3
     }
 }
 

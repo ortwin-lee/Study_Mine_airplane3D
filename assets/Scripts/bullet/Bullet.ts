@@ -7,6 +7,7 @@ import { Constant } from '../framework/Constant'
 @ccclass('Bullet')
 export class Bullet extends Component {
     private _speed = 0;
+    private _direction = Constant.Direction.MIDDLE;
     private _isEnemyBullet = false;
 
 
@@ -27,13 +28,21 @@ export class Bullet extends Component {
     update(deltaTime: number) {
         const pos = this.node.position;
         const moveLength = pos.z + this._speed;
-        this.node.setPosition(pos.x, pos.y, moveLength)
 
-        if(this._isEnemyBullet) {
+        if (this._isEnemyBullet) {
+            this.node.setPosition(pos.x, pos.y, moveLength)
             if (moveLength > Constant.BackgroundRange.Bottom) {
                 this.node.destroy();
             }
         } else {
+            if (this._direction === Constant.Direction.LEFT) {
+                this.node.setPosition(pos.x - Constant.BulletSpeed.XOffset, pos.y, moveLength)
+            } else if (this._direction === Constant.Direction.RIGHT) {
+                this.node.setPosition(pos.x + Constant.BulletSpeed.XOffset, pos.y, moveLength)
+            } else {
+                this.node.setPosition(pos.x, pos.y, moveLength)
+            }
+
             if (moveLength < Constant.BackgroundRange.Top) {
                 this.node.destroy();
             }
@@ -41,17 +50,16 @@ export class Bullet extends Component {
 
     }
 
-    public setBullet(speed: number, isEnemyBullet: boolean) {
-
+    public setBullet(speed: number, isEnemyBullet: boolean, direction: number = Constant.Direction.MIDDLE) {
         this._speed = speed;
+        this._direction = direction;
         this._isEnemyBullet = isEnemyBullet;
     }
 
     //collision
     private _onTriggerEnter(event: ITriggerEvent) {
         const collisionGroup = event.otherCollider.getGroup()
-        if(collisionGroup == Constant.CollisionType.SELF_PLANE || collisionGroup == Constant.CollisionType.SELF_BULLET)
-        {
+        if (collisionGroup == Constant.CollisionType.SELF_PLANE || collisionGroup == Constant.CollisionType.SELF_BULLET) {
             this.node.destroy();
         }
     }
