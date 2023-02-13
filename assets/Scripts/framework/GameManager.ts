@@ -1,14 +1,18 @@
-import { _decorator, Component, Node, Prefab, instantiate, math, Vec3, RigidBodyComponent, macro } from 'cc';
+import { _decorator, Component, Node, Prefab, math, Vec3, RigidBodyComponent, macro, Label, Animation, Pool } from 'cc';
 import { Bullet } from '../bullet/Bullet';
 import { BulletProp } from '../bullet/BulletProp';
 import { EnemyPlane } from '../plane/EnemyPlane';
 import { Constant } from './Constant';
+import { SelfPlane } from '../plane/SelfPlane';
+import { AudioManager } from './AudioManager';
+import { PoolManager } from './PoolManager';
 const { ccclass, property } = _decorator;
+
 
 @ccclass('GameManager')
 export class GameManager extends Component {
-    @property(Node)
-    public playerPlane: Node = null;
+    @property(SelfPlane)
+    public playerPlane: SelfPlane = null;
 
     //bullet
     @property(Prefab)
@@ -53,13 +57,44 @@ export class GameManager extends Component {
     private _currCreateEnemyTime = 0;
     private _combinationInterval = 0;
 
+    //score
+    private _score = 0;
+    @property(Label)
+    public gameScore: Label = null;
+    @property(Label)
+    public gameOverScore: Label = null;
 
+    //gameState
+    public isGameInProcess = false;
 
-    start() {
-        this._init();
-    }
+    //UI
+    @property(Node)
+    public gameStartPage: Node = null;
+    @property(Node)
+    public gamePage: Node = null;
+    @property(Node)
+    public gameOverPage: Node = null;
+    //animation
+    @property(Animation)
+    public gameOverAnima: Animation = null;
+
+    //audio
+    @property(AudioManager)
+    public audioEffect: AudioManager = null;
+
+    //effect
+    @property(Prefab)
+    public enemyExplode: Prefab = null;
 
     update(deltaTime: number) {
+        if (!this.isGameInProcess) {
+            return;
+        }
+
+        if (this.playerPlane.isDied) {
+            this.gameOver();
+        }
+
         //bullet
         this._currshootTime += deltaTime;
         if (this._isShooting && this._currshootTime > this.shootTime) {
@@ -70,6 +105,7 @@ export class GameManager extends Component {
             } else {
                 this.createPlayerBulletM();
             }
+            this.playAudioEffect('bullet' + (this._bulletType % 2 + 1));
             this._currshootTime = 0;
         }
 
@@ -107,17 +143,32 @@ export class GameManager extends Component {
 
 
     private _init() {
+        this._reset();
         this._currshootTime = this.shootTime;
         this._changePlaneCombination();
     }
 
+    private _reset() {
+        //score
+        this._score = 0;
+        this.gameScore.string = '0';
+        //shoot
+        this._currshootTime = 0;
+        this._isShooting = false;
+        //enemy
+        this._currCreateEnemyTime = 0;
+        this._combinationInterval = 0;
+        //bulletType
+        this._bulletType = Constant.BulletPropType.BULLET_M;
+        //playerPlane
+        this.playerPlane.init();
+    }
 
     //bullet
     //-------------------start--------------------------
     public createPlayerBulletM() {
-        const bullet = instantiate(this.bullet01);
-        bullet.setParent(this.bulletRoot);
-        const pos = this.playerPlane.position;
+        const bullet = PoolManager.instance.getNode(this.bullet01, this.bulletRoot);
+        const pos = this.playerPlane.node.position;
         bullet.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletCmp = bullet.getComponent(Bullet);
         bulletCmp.setBullet(Constant.BulletSpeed.PlayerOne, false);
@@ -128,10 +179,9 @@ export class GameManager extends Component {
     }
 
     public createPlayerBulletH() {
-        const pos = this.playerPlane.position;
+        const pos = this.playerPlane.node.position;
         //left
-        const bullet1 = instantiate(this.bullet02);
-        bullet1.setParent(this.bulletRoot);
+        const bullet1 = PoolManager.instance.getNode(this.bullet03, this.bulletRoot);
         bullet1.setPosition(pos.x - 3.5, pos.y, pos.z - 7);
         const bulletCmp1 = bullet1.getComponent(Bullet);
         bulletCmp1.setBullet(Constant.BulletSpeed.PlayerOne, false);
@@ -139,8 +189,7 @@ export class GameManager extends Component {
         colliderComp1.setGroup(Constant.CollisionType.SELF_BULLET);
         colliderComp1.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
         //right
-        const bullet2 = instantiate(this.bullet02);
-        bullet2.setParent(this.bulletRoot);
+        const bullet2 = PoolManager.instance.getNode(this.bullet03, this.bulletRoot);
         bullet2.setPosition(pos.x + 3.5, pos.y, pos.z - 7);
         const bulletCmp2 = bullet2.getComponent(Bullet);
         bulletCmp2.setBullet(Constant.BulletSpeed.PlayerOne, false);
@@ -150,10 +199,9 @@ export class GameManager extends Component {
     }
 
     public createPlayerBulletS() {
-        const pos = this.playerPlane.position;
+        const pos = this.playerPlane.node.position;
         //left
-        const bullet1 = instantiate(this.bullet03);
-        bullet1.setParent(this.bulletRoot);
+        const bullet1 = PoolManager.instance.getNode(this.bullet05, this.bulletRoot);
         bullet1.setPosition(pos.x - 3.5, pos.y, pos.z - 7);
         const bulletCmp1 = bullet1.getComponent(Bullet);
         bulletCmp1.setBullet(Constant.BulletSpeed.PlayerOne, false, Constant.Direction.LEFT);
@@ -161,8 +209,7 @@ export class GameManager extends Component {
         colliderComp1.setGroup(Constant.CollisionType.SELF_BULLET);
         colliderComp1.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
         //middle
-        const bullet2 = instantiate(this.bullet03);
-        bullet2.setParent(this.bulletRoot);
+        const bullet2 = PoolManager.instance.getNode(this.bullet05, this.bulletRoot);
         bullet2.setPosition(pos.x, pos.y, pos.z - 7);
         const bulletCmp2 = bullet2.getComponent(Bullet);
         bulletCmp2.setBullet(Constant.BulletSpeed.PlayerOne, false);
@@ -170,8 +217,7 @@ export class GameManager extends Component {
         colliderComp2.setGroup(Constant.CollisionType.SELF_BULLET);
         colliderComp2.setMask(Constant.CollisionType.ENEMY_PLANE | Constant.CollisionType.ENEMY_BULLET);
         //right
-        const bullet3 = instantiate(this.bullet03);
-        bullet3.setParent(this.bulletRoot);
+        const bullet3 = PoolManager.instance.getNode(this.bullet05, this.bulletRoot);
         bullet3.setPosition(pos.x + 3.5, pos.y, pos.z - 7);
         const bulletCmp3 = bullet3.getComponent(Bullet);
         bulletCmp3.setBullet(Constant.BulletSpeed.PlayerOne, false, Constant.Direction.RIGHT);
@@ -182,8 +228,7 @@ export class GameManager extends Component {
 
 
     public createEnemyBullet(targetPos: Vec3) {
-        const bullet = instantiate(this.bullet01);
-        bullet.setParent(this.bulletRoot);
+        const bullet = PoolManager.instance.getNode(this.bullet02, this.bulletRoot);
         bullet.setPosition(targetPos.x, targetPos.y, targetPos.z + 5);
         const bulletCmp = bullet.getComponent(Bullet);
         bulletCmp.setBullet(Constant.BulletSpeed.EnemyOne, true);
@@ -213,8 +258,7 @@ export class GameManager extends Component {
             prefab = this.bulletPropM;
         }
 
-        const prop = instantiate(prefab);
-        prop.setParent(this.node);
+        const prop = PoolManager.instance.getNode(prefab, this.node);
         const randomPosX = math.randomRangeInt(Constant.BackgroundRange.Left + 15, Constant.BackgroundRange.Right - 15);
         prop.setPosition(randomPosX, 0, Constant.BackgroundRange.Top);
         const propComp = prop.getComponent(BulletProp);
@@ -251,8 +295,7 @@ export class GameManager extends Component {
             speed = Constant.EnemySpeed.two;
         }
 
-        const enemy = instantiate(prefab);
-        enemy.setParent(this.node);
+        const enemy = PoolManager.instance.getNode(prefab, this.node);
         const enemyCmpt_EnemyPlane = enemy.getComponent(EnemyPlane);
         enemyCmpt_EnemyPlane.setEnemyPlane(this, speed, true);
 
@@ -263,12 +306,12 @@ export class GameManager extends Component {
     private createEnemyPlane_CombianationKind2() {
         const enenmyArray = new Array<Node>(5);
         for (let i = 0; i < enenmyArray.length; i++) {
-            enenmyArray[i] = instantiate(this.enemy01);
-            const eachEnemy = enenmyArray[i];
-            eachEnemy.parent = this.node;
+            const eachEnemy = PoolManager.instance.getNode(this.enemy01, this.node);
+            enenmyArray[i] = eachEnemy;
             eachEnemy.setPosition(-20 + i * 10, 0, Constant.BackgroundRange.Top);
             const enemyCmpt_EnemyPlane = eachEnemy.getComponent(EnemyPlane);
             enemyCmpt_EnemyPlane.setEnemyPlane(this, Constant.EnemySpeed.one, false);
+
         }
     }
 
@@ -286,9 +329,8 @@ export class GameManager extends Component {
             [21, 0, posTop - 15],
         ]
         for (let i = 0; i < enenmyArray.length; i++) {
-            enenmyArray[i] = instantiate(this.enemy02);
-            const eachEnemy = enenmyArray[i];
-            eachEnemy.parent = this.node;
+            const eachEnemy = PoolManager.instance.getNode(this.enemy02, this.node);
+            enenmyArray[i] = eachEnemy;
             eachEnemy.setPosition(combiantionPos[i][0], combiantionPos[i][1], combiantionPos[i][2]);
             const enemyCmpt_EnemyPlane = eachEnemy.getComponent(EnemyPlane);
             enemyCmpt_EnemyPlane.setEnemyPlane(this, Constant.EnemySpeed.two, false);
@@ -301,8 +343,65 @@ export class GameManager extends Component {
     //score
     //-------------------start--------------------------
     public addScore() {
-
+        this._score++;
+        this.gameScore.string = this._score.toString();
     }
+    //-------------------end--------------------------
+
+
+    //ui
+    //-------------------start--------------------------
+    public gameStart() {
+        this._init();
+        this.isGameInProcess = true;
+    }
+
+    public gameOver() {
+        this.gameOverPage.active = true;
+        this.gamePage.active = false;
+        this.isGameInProcess = false;
+        this.unschedule(this._combinationChanged);
+        this._destoryAll();
+        Constant.GameEventTarget.emit('closeInputEvent');
+        this.gameOverScore.string = this._score.toString();
+        this.gameOverAnima.play();
+    }
+
+    public restart() {
+        this._init();
+        this.isGameInProcess = true;
+    }
+
+    public returnMain() {
+        this._reset();
+        this.isGameInProcess = false;
+    }
+
+    private _destoryAll() {
+        this.node.removeAllChildren();
+        this.bulletRoot.removeAllChildren();
+    }
+
+    //-------------------end--------------------------
+
+
+    //audio
+    //-------------------start--------------------------
+    public playAudioEffect(name: string) {
+        this.audioEffect.play(name);
+    }
+
+    //-------------------end--------------------------
+
+
+
+    //enemy explode effect
+    //-------------------start--------------------------
+    public createEnemyExplodeEffect(pos: Vec3) {
+        const effect = PoolManager.instance.getNode(this.enemyExplode, this.node);
+        effect.setPosition(pos);
+    }
+
     //-------------------end--------------------------
 
 }

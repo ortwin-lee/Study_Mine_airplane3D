@@ -1,3 +1,5 @@
+import { EventTarget } from "cc";
+
 export class Constant {
     //box range
     public static BackgroundRange = {
@@ -63,6 +65,9 @@ export class Constant {
         ENEMY_BULLET: 1 << 4,
         BULLET_PROP: 1<<5
     }
+
+    //event
+    public static GameEventTarget = new EventTarget();
 }
 
 

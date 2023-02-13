@@ -2,6 +2,7 @@ import { _decorator, Component, ITriggerEvent, Collider } from 'cc';
 const { ccclass } = _decorator;
 
 import { Constant } from '../framework/Constant'
+import { PoolManager } from '../framework/PoolManager';
 
 
 @ccclass('Bullet')
@@ -32,7 +33,7 @@ export class Bullet extends Component {
         if (this._isEnemyBullet) {
             this.node.setPosition(pos.x, pos.y, moveLength)
             if (moveLength > Constant.BackgroundRange.Bottom) {
-                this.node.destroy();
+                PoolManager.instance.putNode(this.node);
             }
         } else {
             if (this._direction === Constant.Direction.LEFT) {
@@ -44,7 +45,7 @@ export class Bullet extends Component {
             }
 
             if (moveLength < Constant.BackgroundRange.Top) {
-                this.node.destroy();
+                PoolManager.instance.putNode(this.node);
             }
         }
 
@@ -60,7 +61,7 @@ export class Bullet extends Component {
     private _onTriggerEnter(event: ITriggerEvent) {
         const collisionGroup = event.otherCollider.getGroup()
         if (collisionGroup == Constant.CollisionType.SELF_PLANE || collisionGroup == Constant.CollisionType.SELF_BULLET) {
-            this.node.destroy();
+            PoolManager.instance.putNode(this.node);
         }
     }
 }
